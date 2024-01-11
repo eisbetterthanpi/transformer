@@ -15,7 +15,6 @@ can try using a learnt position embedding instead of the fixed sin/cos position 
 
 ### extra resources:<br />
 https://github.com/bentrevett/pytorch-seq2seq/blob/master/6%20-%20Attention%20is%20All%20You%20Need.ipynb<br />
-https://colab.research.google.com/github/bentrevett/pytorch-seq2seq/blob/master/6%20-%20Attention%20is%20All%20You%20Need.ipynb<br />
 https://www.mihaileric.com/posts/transformers-attention-in-disguise/<br />
 https://jalammar.github.io/illustrated-transformer/<br />
 http://nlp.seas.harvard.edu/2018/04/03/attention.html<br />
