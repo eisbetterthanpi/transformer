@@ -1,5 +1,4 @@
 # transformer
-
 Implementation of the transformer model from the paper [Attention Is All You Need](https://arxiv.org/pdf/1706.03762.pdf) in pytorch for sequence to sequence translation.<br /><br />
 There are two implementations, one using nn.Transformer and the other from scratch.<br />
 
@@ -12,6 +11,14 @@ There are two implementations, one using nn.Transformer and the other from scrat
 Without these 3, the performance of the transformer will be significantly hindered!<br />
 
 can try using a learnt position embedding instead of the fixed sin/cos position embedding.
+
+<div align="center">
+  <div>&nbsp;</div>
+  <img src="resources/transformer.png" width="400"/>
+  <img src="resources/mha.png" width="200"/>
+<!--   <div align="center">original | reconstructed </div> -->
+</div>
+
 
 ### extra resources:<br />
 https://github.com/bentrevett/pytorch-seq2seq/blob/master/6%20-%20Attention%20is%20All%20You%20Need.ipynb<br />
