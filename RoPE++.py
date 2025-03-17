@@ -171,6 +171,19 @@ print(out.shape)
 
 
 
+# class LearnedSinusoidalPosEmb(nn.Module):
+#     """ https://github.com/crowsonkb/v-diffusion-jax/blob/master/diffusion/models/danbooru_128.py#L8 """
+#     def __init__(self, dim):
+#         super().__init__()
+#         half_dim = dim // 2
+#         self.weights = nn.Parameter(torch.randn(1, half_dim))
+
+#     def forward(self, x): # [b]
+#         x = x.unsqueeze(-1)
+#         freqs = x * self.weights * 2 * math.pi # [b, 1] * [1, half_dim] = [b, half_dim]
+#         fouriered = torch.cat((freqs.sin(), freqs.cos()), dim = -1) # [b, dim]
+#         fouriered = torch.cat((x, fouriered), dim = -1) # [b, 1+dim]
+#         return fouriered
 
 
 
