@@ -127,15 +127,16 @@ class RoPE2D(nn.Module): # Rotary Positional Embeddings
         rot_emb = self.rot_emb[:, :h, :w].unsqueeze(0) # [1, h, w, dim]
         return img * rot_emb
 
-# def RoPE2D(dim, h=224, w=224, temp = 10000):
-#     y, x = torch.meshgrid(torch.arange(h), torch.arange(w), indexing="ij") # print(y,x) # [h,w], y:row_num, x:col_num
-#     omega = 1. / (temp**torch.linspace(0,1,dim//4))
-#     # print(omega)
-#     y, x = y.reshape(-1,1) * omega.unsqueeze(0), x.reshape(-1,1) * omega.unsqueeze(0) # [h*w,1]*[1,dim//4] = [h*w,dim//4]
-#     # y, x = y.reshape(-1,1) * omega.unsqueeze(0), x.reshape(-1,1) * omega[None,...,None] # [h*w,1]*[1,dim//4] = [h*w,dim//4]
-#     # print(y.shape,x.shape) # [h,w], y:row num, x:col num
-#     pe = torch.cat((x.sin(), x.cos(), y.sin(), y.cos()), dim=1) # [h*w,dim]
-#     return pe
+
+def RoPE2D(dim=16, h=8, w=8, base=10000):
+    # theta = 1. / (base ** (torch.arange(0, dim, step=4) / dim))
+    theta = 1. / (base**torch.linspace(0,1,dim//4)).unsqueeze(0)
+    y, x = torch.meshgrid(torch.arange(h), torch.arange(w), indexing="ij") # print(y,x) # [h,w], y:row_num, x:col_num
+    y, x = (y.reshape(-1,1) * theta).unsqueeze(-1), (x.reshape(-1,1) * theta).unsqueeze(-1) # [h*w,1]*[1,dim//4] = [h*w, dim//4, 1]
+    rot_emb = torch.cat([x.sin(), x.cos(), y.sin(), y.cos()], dim=-1).flatten(-2) # [h*w, dim//4 ,4] -> [h*w, dim]
+    # rot_emb = torch.cat([x.sin(), x.cos(), y.sin(), y.cos()], dim=-1)#.reshape(dim, h, w).to(device) # [h*w, dim//4 ,4] -> [h, w, dim]
+    return rot_emb
+
 
 
 def posemb_sincos_2d(h, w, dim, temp = 10000):
