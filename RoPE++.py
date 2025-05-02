@@ -11,10 +11,10 @@ class RoPE(nn.Module): # Rotary Positional Embeddings
         angles = (pos * theta)[None,...,None] # [seq_len, 1] * [dim // 2] -> [1, seq_len, dim // 2, 1]
         self.rot_emb = torch.cat([torch.sin(angles), torch.cos(angles)], dim=-1).flatten(-2).to(device) # [seq_len, dim // 2, 2] -> [1, seq_len, dim]
 
-    def forward(self, x):
+    def forward(self, x): # [b,t,d]
         seq_len = x.size(1)
-        if self.rot_emb.shape[0] < seq_len: self.__init__(self.dim, seq_len, self.base)
-        return x * self.rot_emb[:seq_len]
+        if self.rot_emb.shape[1] < seq_len: self.__init__(self.dim, seq_len, self.base)
+        return x * self.rot_emb[:,:seq_len]
 
 # class LearnedRoPE(nn.Module): # learnt RoPE ; each tok is 1 pos
 #     def __init__(self, dim):
