@@ -1,5 +1,6 @@
 # @title hf stream dataset me
-!pip install -qU datasets # restart?
+# !pip install -qU datasets # restart?
+!pip install datasets==2.13.1 # restart
 from datasets import load_dataset
 import torch
 from torch.utils.data import Dataset
@@ -35,23 +36,26 @@ class StreamDataset(Dataset):
             raise StopIteration
         x = self.buffer[:self.seq_len]
         self.buffer = self.buffer[self.seq_len:]
-        return torch.tensor(x)
+        # return torch.tensor(x)
+        return torch.tensor(x, dtype=torch.int32)
 
 def collate_fn(batch):
     # print(batch)
     return torch.stack(batch)
 
-# dataset = load_dataset("stas/openwebtext-10k", split="train", streaming=True, cache_dir="/content/hf")
-# dataset = load_dataset("maxtli/OpenWebText-2M", split="train", streaming=True, cache_dir="/content/hf") # 8.7,3.8
-dataset = load_dataset("Skylion007/openwebtext", trust_remote_code=True, split="train", streaming=True, cache_dir="/content/hf") # 8.7,3.8
+name = 'Skylion007/openwebtext' if torch.cuda.is_available() else 'stas/openwebtext-10k'
 
-seq_len = 128
+dataset = load_dataset(name, trust_remote_code=True, split="train", streaming=True, cache_dir="/content/hf") # 8.7,3.8
+# dataset = load_dataset("Skylion007/openwebtext", trust_remote_code=True, split="train", streaming=True, cache_dir="/content/hf") # 8.7,3.8
+# dataset = load_dataset("deepmind/pg19", trust_remote_code=True, split="train", streaming=True, cache_dir="/content/hf") # 8.7,3.8
+
+seq_len = 128*1+1 # 128
 buffer_size = seq_len*1
 train_data = StreamDataset(dataset, seq_len, buffer_size) # train_data = StreamDataset(dataset["train"], seq_len, buffer_size)
-del dataset
+# del dataset
 
 from torch.utils.data.dataloader import DataLoader
-batch_size = 64 #512
+batch_size = 64 if torch.cuda.is_available() else 16 #64 512
 train_loader = DataLoader(train_data, batch_size=batch_size, collate_fn=collate_fn, shuffle=True, pin_memory=True, num_workers=2)
 del train_data
 def encode(context):
@@ -62,5 +66,3 @@ def decode(x): return train_loader.dataset.enc.decode(list(x))
 # for x,y in train_loader:
 #     break
 # print(train_data.vocab_size)
-
-
