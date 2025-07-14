@@ -1,7 +1,5 @@
 # @title hf stream dataset me
 # !pip install -qU datasets # restart?
-!pip install datasets==2.13.1 # restart
-from datasets import load_dataset
 import torch
 from torch.utils.data import Dataset
 import tiktoken # https://github.com/openai/tiktoken/tree/main
@@ -39,15 +37,9 @@ class StreamDataset(Dataset):
         # return torch.tensor(x)
         return torch.tensor(x, dtype=torch.int32)
 
-def collate_fn(batch):
-    # print(batch)
-    return torch.stack(batch)
-
+from datasets import load_dataset
 name = 'Skylion007/openwebtext' if torch.cuda.is_available() else 'stas/openwebtext-10k'
-
-dataset = load_dataset(name, trust_remote_code=True, split="train", streaming=True, cache_dir="/content/hf") # 8.7,3.8
-# dataset = load_dataset("Skylion007/openwebtext", trust_remote_code=True, split="train", streaming=True, cache_dir="/content/hf") # 8.7,3.8
-# dataset = load_dataset("deepmind/pg19", trust_remote_code=True, split="train", streaming=True, cache_dir="/content/hf") # 8.7,3.8
+dataset = load_dataset(name, split="train", streaming=True, revision='refs/convert/parquet', cache_dir="/content/hf")
 
 seq_len = 128*1+1 # 128
 buffer_size = seq_len*1
@@ -56,7 +48,8 @@ train_data = StreamDataset(dataset, seq_len, buffer_size) # train_data = StreamD
 
 from torch.utils.data.dataloader import DataLoader
 batch_size = 64 if torch.cuda.is_available() else 16 #64 512
-train_loader = DataLoader(train_data, batch_size=batch_size, collate_fn=collate_fn, shuffle=True, pin_memory=True, num_workers=2)
+# train_loader = DataLoader(train_data, batch_size=batch_size, shuffle=True, pin_memory=True, num_workers=2)
+train_loader = DataLoader(train_data, batch_size=batch_size, pin_memory=True, num_workers=2)
 del train_data
 def encode(context):
     if type(context) == str: return torch.tensor([train_loader.dataset.enc.encode(context)], device=device)
@@ -64,5 +57,6 @@ def encode(context):
     else: raise Exception
 def decode(x): return train_loader.dataset.enc.decode(list(x))
 # for x,y in train_loader:
+#     print(x.shape, x)
 #     break
 # print(train_data.vocab_size)
