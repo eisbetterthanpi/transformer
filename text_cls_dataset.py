@@ -33,10 +33,11 @@ class ByteDataset(Dataset):
 
 train_data = ByteDataset(dataset)
 
+pad_idx = -1
 from torch.nn.utils.rnn import pad_sequence
 def collate_fn(batch):
     x, y = zip(*batch)
-    x = pad_sequence(x, batch_first=True, padding_value=0, padding_side='left')
+    x = pad_sequence(x, batch_first=True, padding_value=pad_idx, padding_side='left')
     # print(x,y)
     return x, torch.tensor(y).unsqueeze(-1)
 
